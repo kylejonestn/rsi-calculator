@@ -4,6 +4,11 @@
     <title>RSI Bundle Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        /* Set a larger base font size for the whole document */
+        html {
+            font-size: 110%;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             padding: 20px;
@@ -23,21 +28,23 @@
         }
         h2 {
             color: #333;
+            font-size: 2.25rem; /* Increased font size */
         }
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
             text-align: left; /* Align labels to the left */
+            font-size: 1.25rem; /* Increased font size */
         }
         input, button {
-            padding: 12px;
+            padding: 16px; /* Increased padding for larger text */
             margin-bottom: 10px;
             width: 100%;
             box-sizing: border-box; /* Ensures padding doesn't affect width */
             border-radius: 5px;
             border: 1px solid #ccc;
-            font-size: 16px;
+            font-size: 1.5rem; /* Increased font size */
         }
         button {
             background-color: #007bff;
@@ -49,34 +56,41 @@
         button:hover {
             background-color: #0056b3;
         }
+        /* UPDATED: Result div now has a light gray background */
         .result {
-            background-color: #fff;
+            background-color: #e9ecef; /* Light gray background */
             padding: 15px;
             margin-top: 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: left; /* Align results to the left */
+            text-align: left;
+            font-size: 1.25rem; /* Increased base font size for results */
         }
         .result > h3 {
             margin-top: 0;
             color: #333;
-            border-bottom: 2px solid #eee;
+            border-bottom: 2px solid #ddd;
             padding-bottom: 10px;
             margin-bottom: 15px;
             text-align: center; /* Center the main "Results for X kg" header */
         }
-        /* Styles for the new sections from your updated file */
+        /* UPDATED: Section divs now have a white background */
         .section {
-            margin-top: 25px;
+            background-color: #ffffff; /* White background for each section box */
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
         }
         .section:first-child {
             margin-top: 0;
         }
         .section h3 {
             color: #444;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 5px;
-            font-size: 1.1em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.75rem; /* Increased font size */
+            border-bottom: none; /* Removed the line separator */
         }
     </style>
     <script>
@@ -139,8 +153,7 @@
         }
 
         function displaySection(title, items) {
-            // Added line-height for better readability of multi-line items
-            return `<div class="section"><h3 style="line-height: 1.6;">${title}</h3>${items.join("<br><br>")}</div>`;
+            return `<div class="section"><h3>${title}</h3><div style="line-height: 1.6;">${items.join("<br><br>")}</div></div>`;
         }
 
         function suggestSyringe(volume) {
