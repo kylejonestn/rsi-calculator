@@ -1,13 +1,67 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>RSI Bundle Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f2f2f2; }
-        h2 { color: #333; }
-        input, button { padding: 10px; margin: 5px 0; width: 100%; }
-        .result { background-color: #fff; padding: 15px; margin-top: 20px; border-radius: 5px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 20px;
+            background-color: #f2f2f2;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px; /* Max width for larger screens */
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, button {
+            padding: 12px;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            background-color: #fff;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .med-result {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
     </style>
     <script>
         function calculateRSI() {
@@ -34,12 +88,12 @@
                 let dose = med.dosePerKg * weight;
                 if (med.maxDose && dose > med.maxDose) dose = med.maxDose;
                 let volume = dose / med.conc;
-                let syringe = volume <= 1 ? "1 mL" : volume <= 3 ? "3 mL" : volume <= 6 ? "5 mL" : volume <= 10 ? "10 mL" : "20 mL+";
+                let syringe = volume <= 1 ? "1 mL" : volume <= 3 ? "3 mL" : volume <= 5 ? "5 mL" : volume <= 10 ? "10 mL" : "20 mL+";
                 resultHTML += `
-                    <div><strong>${med.name}:</strong><br>
+                    <div class="med-result"><strong>${med.name}:</strong><br>
                     Dose: ${dose.toFixed(2)} ${med.unit}<br>
                     Volume: ${volume.toFixed(2)} mL<br>
-                    Suggested Syringe: ${syringe}</div><br>`;
+                    Suggested Syringe: ${syringe}</div>`;
             });
 
             document.getElementById('results').innerHTML = resultHTML;
@@ -47,11 +101,13 @@
     </script>
 </head>
 <body>
-    <h2>RSI Bundle Calculator (Macon County EMS)</h2>
-    <label for="weight">Enter patient weight (kg):</label>
-    <input type="number" id="weight" placeholder="e.g. 80">
-    <button onclick="calculateRSI()">Calculate</button>
+    <div class="container">
+        <h2>RSI Bundle Calculator<br>(Macon County EMS)</h2>
+        <label for="weight">Enter patient weight (kg):</label>
+        <input type="number" id="weight" placeholder="e.g., 80" inputmode="decimal">
+        <button onclick="calculateRSI()">Calculate</button>
 
-    <div class="result" id="results"></div>
+        <div class="result" id="results"></div>
+    </div>
 </body>
 </html>
