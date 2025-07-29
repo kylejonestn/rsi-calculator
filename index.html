@@ -1,0 +1,57 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RSI Bundle Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f2f2f2; }
+        h2 { color: #333; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; }
+        .result { background-color: #fff; padding: 15px; margin-top: 20px; border-radius: 5px; }
+    </style>
+    <script>
+        function calculateRSI() {
+            let weight = parseFloat(document.getElementById('weight').value);
+            if (isNaN(weight) || weight <= 0) {
+                alert("Please enter a valid weight in kg.");
+                return;
+            }
+
+            const meds = [
+                { name: "Etomidate", dosePerKg: 0.3, conc: 2, unit: "mg" },
+                { name: "Succinylcholine", dosePerKg: 1.0, conc: 20, unit: "mg" },
+                { name: "Vecuronium (Low Dose)", dosePerKg: 0.01, conc: 1, unit: "mg" },
+                { name: "Vecuronium (High Dose)", dosePerKg: 0.1, conc: 1, unit: "mg" },
+                { name: "Ketamine (Induction)", dosePerKg: 2.0, conc: 50, unit: "mg" },
+                { name: "Ketamine (Sedation)", dosePerKg: 1.0, conc: 50, unit: "mg" },
+                { name: "Versed", dosePerKg: 0.05, conc: 5, unit: "mg", maxDose: 5 },
+                { name: "Fentanyl", dosePerKg: 0.5, conc: 50, unit: "mcg" }
+            ];
+
+            let resultHTML = "<h3>Results for " + weight + " kg</h3>";
+
+            meds.forEach(med => {
+                let dose = med.dosePerKg * weight;
+                if (med.maxDose && dose > med.maxDose) dose = med.maxDose;
+                let volume = dose / med.conc;
+                let syringe = volume <= 1 ? "1 mL" : volume <= 3 ? "3 mL" : volume <= 6 ? "5 mL" : volume <= 10 ? "10 mL" : "20 mL+";
+                resultHTML += `
+                    <div><strong>${med.name}:</strong><br>
+                    Dose: ${dose.toFixed(2)} ${med.unit}<br>
+                    Volume: ${volume.toFixed(2)} mL<br>
+                    Suggested Syringe: ${syringe}</div><br>`;
+            });
+
+            document.getElementById('results').innerHTML = resultHTML;
+        }
+    </script>
+</head>
+<body>
+    <h2>RSI Bundle Calculator (Macon County EMS)</h2>
+    <label for="weight">Enter patient weight (kg):</label>
+    <input type="number" id="weight" placeholder="e.g. 80">
+    <button onclick="calculateRSI()">Calculate</button>
+
+    <div class="result" id="results"></div>
+</body>
+</html>
