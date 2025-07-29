@@ -57,17 +57,26 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             text-align: left; /* Align results to the left */
         }
-        .result h3 {
+        .result > h3 {
             margin-top: 0;
             color: #333;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
             margin-bottom: 15px;
-            text-align: center; /* Center the results header */
+            text-align: center; /* Center the main "Results for X kg" header */
         }
-        .med-result {
-            margin-bottom: 15px;
-            line-height: 1.6;
+        /* Styles for the new sections from your updated file */
+        .section {
+            margin-top: 25px;
+        }
+        .section:first-child {
+            margin-top: 0;
+        }
+        .section h3 {
+            color: #444;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            font-size: 1.1em;
         }
     </style>
     <script>
@@ -78,38 +87,74 @@
                 return;
             }
 
-            const meds = [
-                { name: "Etomidate", dosePerKg: 0.3, conc: 2, unit: "mg" },
-                { name: "Succinylcholine", dosePerKg: 1.0, conc: 20, unit: "mg" },
-                { name: "Vecuronium (Low Dose)", dosePerKg: 0.01, conc: 1, unit: "mg" },
-                { name: "Vecuronium (High Dose)", dosePerKg: 0.1, conc: 1, unit: "mg" },
-                { name: "Ketamine (Induction)", dosePerKg: 2.0, conc: 50, unit: "mg" },
-                { name: "Ketamine (Sedation)", dosePerKg: 1.0, conc: 50, unit: "mg" },
-                { name: "Versed", dosePerKg: 0.05, conc: 5, unit: "mg", maxDose: 5 },
-                { name: "Fentanyl", dosePerKg: 0.5, conc: 50, unit: "mcg" }
-            ];
+            const result = {
+                sedation: [],
+                paralytics: [],
+                postIntubation: [],
+                painManagement: []
+            };
 
-            let resultHTML = "<h3>Results for " + weight + " kg</h3>";
+            // Sedation: Etomidate, Versed (2–5 mg), Ketamine (Induction)
+            let etomidateDose = 0.3 * weight;
+            let etomidateVol = etomidateDose / 2;
+            result.sedation.push(`<strong>Etomidate:</strong><br>Dose: ${etomidateDose.toFixed(2)} mg<br>Volume: ${etomidateVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(etomidateVol)}`);
 
-            meds.forEach(med => {
-                let dose = med.dosePerKg * weight;
-                if (med.maxDose && dose > med.maxDose) dose = med.maxDose;
-                let volume = dose / med.conc;
-                let syringe = volume <= 1 ? "1 mL" : volume <= 3 ? "3 mL" : volume <= 5 ? "5 mL" : volume <= 10 ? "10 mL" : "20 mL+";
-                resultHTML += `
-                    <div class="med-result"><strong>${med.name}:</strong><br>
-                    Dose: ${dose.toFixed(2)} ${med.unit}<br>
-                    Volume: ${volume.toFixed(2)} mL<br>
-                    Suggested Syringe: ${syringe}</div>`;
-            });
+            result.sedation.push(`<strong>Versed (Sedation):</strong><br>2 mg = 0.4 mL<br>3 mg = 0.6 mL<br>4 mg = 0.8 mL<br>5 mg = 1.0 mL<br>All use 1 mL syringe`);
 
-            document.getElementById('results').innerHTML = resultHTML;
+            let ketamineInductionDose = 2.0 * weight;
+            let ketamineInductionVol = ketamineInductionDose / 50;
+            result.sedation.push(`<strong>Ketamine (Induction):</strong><br>Dose: ${ketamineInductionDose.toFixed(2)} mg<br>Volume: ${ketamineInductionVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineInductionVol)}`);
+
+            // Paralytics: Succinylcholine, Vecuronium (Low & High)
+            let succDose = 1.0 * weight;
+            let succVol = succDose / 20;
+            result.paralytics.push(`<strong>Succinylcholine:</strong><br>Dose: ${succDose.toFixed(2)} mg<br>Volume: ${succVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(succVol)}`);
+
+            let vecLowDose = 0.01 * weight;
+            let vecLowVol = vecLowDose / 1;
+            result.paralytics.push(`<strong>Vecuronium (Low Dose):</strong><br>Dose: ${vecLowDose.toFixed(2)} mg<br>Volume: ${vecLowVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecLowVol)}`);
+
+            let vecHighDose = 0.1 * weight;
+            let vecHighVol = vecHighDose / 1;
+            result.paralytics.push(`<strong>Vecuronium (High Dose):</strong><br>Dose: ${vecHighDose.toFixed(2)} mg<br>Volume: ${vecHighVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecHighVol)}`);
+
+            // Post Intubation: Ketamine (Sedation)
+            let ketamineSedationDose = 1.0 * weight;
+            let ketamineSedationVol = ketamineSedationDose / 50;
+            result.postIntubation.push(`<strong>Ketamine (Sedation):</strong><br>Dose: ${ketamineSedationDose.toFixed(2)} mg<br>Volume: ${ketamineSedationVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineSedationVol)}`);
+
+            // Pain Management: Fentanyl
+            let fentanylDose = 0.5 * weight;
+            let fentanylVol = fentanylDose / 50;
+            result.painManagement.push(`<strong>Fentanyl:</strong><br>Dose: ${fentanylDose.toFixed(2)} mcg<br>Volume: ${fentanylVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(fentanylVol)}`);
+
+            // Display Results
+            let output = `<h3>Results for ${weight} kg</h3>`;
+            output += displaySection("Sedation", result.sedation);
+            output += displaySection("Paralyzing Agent", result.paralytics);
+            output += displaySection("Post Intubation", result.postIntubation);
+            output += displaySection("Pain Management", result.painManagement);
+
+            document.getElementById('results').innerHTML = output;
+        }
+
+        function displaySection(title, items) {
+            // Added line-height for better readability of multi-line items
+            return `<div class="section"><h3 style="line-height: 1.6;">${title}</h3>${items.join("<br><br>")}</div>`;
+        }
+
+        function suggestSyringe(volume) {
+            if (volume <= 1) return "1 mL";
+            if (volume <= 3) return "3 mL";
+            if (volume <= 6) return "5 mL";
+            if (volume <= 10) return "10 mL";
+            return "20 mL+";
         }
     </script>
 </head>
 <body>
     <div class="container">
-        <img src="ems_logo.jpeg" alt="Macon County EMS Logo" class="logo">
+        <img src="ems_macon_tn_logo.png" alt="Macon County EMS Logo" class="logo">
         <h2>RSI Bundle Calculator<br>(Macon County EMS)</h2>
         <label for="weight">Enter patient weight (kg):</label>
         <input type="number" id="weight" placeholder="e.g., 80" inputmode="decimal">
