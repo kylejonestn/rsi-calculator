@@ -4,11 +4,7 @@
     <title>RSI Bundle Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* Set a larger base font size for the whole document */
-        html {
-            font-size: 110%;
-        }
-
+        html { font-size: 110%; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             padding: 20px;
@@ -17,34 +13,24 @@
             display: flex;
             justify-content: center;
         }
-        .container {
-            width: 100%;
-            max-width: 600px; /* Max width for larger screens */
-            text-align: center; /* Center align content */
-        }
-        .logo {
-            width: 80px;
-            margin-bottom: 15px;
-        }
-        h2 {
-            color: #333;
-            font-size: 2.25rem; /* Increased font size */
-        }
+        .container { width: 100%; max-width: 600px; text-align: center; }
+        .logo { width: 80px; margin-bottom: 15px; }
+        h2 { color: #333; font-size: 2.25rem; }
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
-            text-align: left; /* Align labels to the left */
-            font-size: 1.25rem; /* Increased font size */
+            text-align: left;
+            font-size: 1.25rem;
         }
         input, button {
-            padding: 16px; /* Increased padding for larger text */
+            padding: 16px;
             margin-bottom: 10px;
             width: 100%;
-            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            box-sizing: border-box;
             border-radius: 5px;
             border: 1px solid #ccc;
-            font-size: 1.5rem; /* Increased font size */
+            font-size: 1.5rem;
         }
         button {
             background-color: #007bff;
@@ -53,18 +39,15 @@
             cursor: pointer;
             font-weight: bold;
         }
-        button:hover {
-            background-color: #0056b3;
-        }
-        /* UPDATED: Result div now has a light gray background */
+        button:hover { background-color: #0056b3; }
         .result {
-            background-color: #e9ecef; /* Light gray background */
+            background-color: #e9ecef;
             padding: 15px;
             margin-top: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             text-align: left;
-            font-size: 1.25rem; /* Increased base font size for results */
+            font-size: 1.25rem;
         }
         .result > h3 {
             margin-top: 0;
@@ -72,25 +55,21 @@
             border-bottom: 2px solid #ddd;
             padding-bottom: 10px;
             margin-bottom: 15px;
-            text-align: center; /* Center the main "Results for X kg" header */
+            text-align: center;
         }
-        /* UPDATED: Section divs now have a white background */
         .section {
-            background-color: #ffffff; /* White background for each section box */
+            background-color: #ffffff;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
         }
-        .section:first-child {
-            margin-top: 0;
-        }
+        .section:first-child { margin-top: 0; }
         .section h3 {
             color: #444;
             margin-top: 0;
             margin-bottom: 15px;
-            font-size: 1.75rem; /* Increased font size */
-            border-bottom: none; /* Removed the line separator */
+            font-size: 1.75rem;
         }
     </style>
     <script>
@@ -108,7 +87,6 @@
                 painManagement: []
             };
 
-            // Sedation: Etomidate, Versed (2–5 mg), Ketamine (Induction)
             let etomidateDose = 0.3 * weight;
             let etomidateVol = etomidateDose / 2;
             result.sedation.push(`<strong>Etomidate:</strong><br>Dose: ${etomidateDose.toFixed(2)} mg<br>Volume: ${etomidateVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(etomidateVol)}`);
@@ -119,7 +97,6 @@
             let ketamineInductionVol = ketamineInductionDose / 50;
             result.sedation.push(`<strong>Ketamine (Induction):</strong><br>Dose: ${ketamineInductionDose.toFixed(2)} mg<br>Volume: ${ketamineInductionVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineInductionVol)}`);
 
-            // Paralytics: Succinylcholine, Vecuronium (Low & High)
             let succDose = 1.0 * weight;
             let succVol = succDose / 20;
             result.paralytics.push(`<strong>Succinylcholine:</strong><br>Dose: ${succDose.toFixed(2)} mg<br>Volume: ${succVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(succVol)}`);
@@ -132,17 +109,19 @@
             let vecHighVol = vecHighDose / 1;
             result.paralytics.push(`<strong>Vecuronium (High Dose):</strong><br>Dose: ${vecHighDose.toFixed(2)} mg<br>Volume: ${vecHighVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecHighVol)}`);
 
-            // Post Intubation: Ketamine (Sedation)
             let ketamineSedationDose = 1.0 * weight;
             let ketamineSedationVol = ketamineSedationDose / 50;
             result.postIntubation.push(`<strong>Ketamine (Sedation):</strong><br>Dose: ${ketamineSedationDose.toFixed(2)} mg<br>Volume: ${ketamineSedationVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineSedationVol)}`);
 
-            // Pain Management: Fentanyl
             let fentanylDose = 0.5 * weight;
+            if (fentanylDose > 100) fentanylDose = 100;
             let fentanylVol = fentanylDose / 50;
             result.painManagement.push(`<strong>Fentanyl:</strong><br>Dose: ${fentanylDose.toFixed(2)} mcg<br>Volume: ${fentanylVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(fentanylVol)}`);
 
-            // Display Results
+            result.painManagement.push(`<strong>Morphine:</strong><br>2 mg = 0.2 mL<br>Max 10 mg = 1.0 mL<br>Syringe: 1 mL`);
+
+            result.painManagement.push(`<strong>Demerol:</strong><br>25 mg = 0.5 mL<br>Max 50 mg = 1.0 mL<br>Syringe: 1 mL<br>+ <strong>Phenergan:</strong> 12.5 mg = 0.5 mL`);
+
             let output = `<h3>Results for ${weight} kg</h3>`;
             output += displaySection("Sedation", result.sedation);
             output += displaySection("Paralyzing Agent", result.paralytics);
@@ -172,7 +151,6 @@
         <label for="weight">Enter patient weight (kg):</label>
         <input type="number" id="weight" placeholder="e.g., 80" inputmode="decimal">
         <button onclick="calculateRSI()">Calculate</button>
-
         <div class="result" id="results"></div>
     </div>
 </body>
