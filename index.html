@@ -72,12 +72,29 @@
             margin-bottom: 15px;
             font-size: 1.75rem;
         }
-        /* NEW: Style for formula/context text */
         .section small {
             color: #6c757d;
             font-size: 0.9em;
             display: block;
             line-height: 1.2;
+        }
+        /* NEW: Styles for tappable medication items */
+        .med-item {
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            margin-bottom: 15px;
+        }
+        .med-item:last-child {
+            margin-bottom: 0;
+        }
+        /* NEW: Styles for the selected state */
+        .med-selected {
+            background-color: #cfe2ff; /* Light blue background */
+        }
+        .med-selected strong {
+            color: #004085; /* Dark blue text for the drug title */
         }
         .swiper-container {
             width: 100%;
@@ -139,6 +156,16 @@
             });
         }
 
+        // NEW: Function to make medication items tappable
+        function addMedicationToggles() {
+            const medItems = document.querySelectorAll('.med-item');
+            medItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    this.classList.toggle('med-selected');
+                });
+            });
+        }
+
         function calculateRSI() {
             const resultsDiv = document.getElementById('results');
             let weight = parseFloat(document.getElementById('weight').value);
@@ -155,52 +182,46 @@
                 painManagement: []
             };
 
-            // Sedation Calculations
+            // UPDATED: Each medication is now wrapped in a .med-item div
             let etomidateDose = 0.3 * weight;
             let etomidateVol = etomidateDose / 2;
-            result.sedation.push(`<strong>Etomidate:</strong><br>Dose: ${etomidateDose.toFixed(2)} mg<br>Volume: ${etomidateVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(etomidateVol)}`);
-            result.sedation.push(`<strong>Versed (Sedation):</strong><br>2 mg = 0.4 mL<br>3 mg = 0.6 mL<br>4 mg = 0.8 mL<br>5 mg = 1.0 mL<br>All use 1 mL syringe`);
+            result.sedation.push(`<div class="med-item"><strong>Etomidate:</strong><br>Dose: ${etomidateDose.toFixed(2)} mg<br>Volume: ${etomidateVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(etomidateVol)}</div>`);
+            result.sedation.push(`<div class="med-item"><strong>Versed (Sedation):</strong><br>2 mg = 0.4 mL<br>3 mg = 0.6 mL<br>4 mg = 0.8 mL<br>5 mg = 1.0 mL<br>All use 1 mL syringe</div>`);
             let ketamineInductionDose = 2.0 * weight;
             let ketamineInductionVol = ketamineInductionDose / 50;
-            result.sedation.push(`<strong>Ketamine (Induction):</strong><br>Dose: ${ketamineInductionDose.toFixed(2)} mg<br>Volume: ${ketamineInductionVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineInductionVol)}`);
+            result.sedation.push(`<div class="med-item"><strong>Ketamine (Induction):</strong><br>Dose: ${ketamineInductionDose.toFixed(2)} mg<br>Volume: ${ketamineInductionVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineInductionVol)}</div>`);
             
-            // Paralytics Calculations
             let succDose = 1.0 * weight;
             let succVol = succDose / 20;
-            result.paralytics.push(`<strong>Succinylcholine:</strong><br>Dose: ${succDose.toFixed(2)} mg<br>Volume: ${succVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(succVol)}`);
+            result.paralytics.push(`<div class="med-item"><strong>Succinylcholine:</strong><br>Dose: ${succDose.toFixed(2)} mg<br>Volume: ${succVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(succVol)}</div>`);
             let vecLowDose = 0.01 * weight;
             let vecLowVol = vecLowDose / 1;
-            result.paralytics.push(`<strong>Vecuronium (Low Dose):</strong><br>Dose: ${vecLowDose.toFixed(2)} mg<br>Volume: ${vecLowVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecLowVol)}`);
+            result.paralytics.push(`<div class="med-item"><strong>Vecuronium (Low Dose):</strong><br>Dose: ${vecLowDose.toFixed(2)} mg<br>Volume: ${vecLowVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecLowVol)}</div>`);
             let vecHighDose = 0.1 * weight;
             let vecHighVol = vecHighDose / 1;
-            result.paralytics.push(`<strong>Vecuronium (High Dose):</strong><br>Dose: ${vecHighDose.toFixed(2)} mg<br>Volume: ${vecHighVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecHighVol)}`);
+            result.paralytics.push(`<div class="med-item"><strong>Vecuronium (High Dose):</strong><br>Dose: ${vecHighDose.toFixed(2)} mg<br>Volume: ${vecHighVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecHighVol)}</div>`);
             
-            // --- UPDATED Post Intubation Calculations ---
-            result.postIntubation.push(`If patients level of consciousness increases and sedation is required:`);
+            result.postIntubation.push(`<div class="med-item">If patients level of consciousness increases and sedation is required:</div>`);
             
-            // Fentanyl
             let postFentanylDose = 0.5 * weight;
             let postFentanylVol = postFentanylDose / 50;
-            result.postIntubation.push(`<strong>Fentanyl:</strong><small>(0.5 mcg/kg)</small><br>Dose: ${postFentanylDose.toFixed(2)} mcg<br>Volume: ${postFentanylVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(postFentanylVol)}<small>(0.5 mcg/kg increment maximum)<br>(5.0 mcg/kg maximum)</small>`);
+            result.postIntubation.push(`<div class="med-item"><strong>Fentanyl:</strong><small>(0.5 mcg/kg)</small><br>Dose: ${postFentanylDose.toFixed(2)} mcg<br>Volume: ${postFentanylVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(postFentanylVol)}<small>(0.5 mcg/kg increment maximum)<br>(5.0 mcg/kg maximum)</small></div>`);
             
-            // Versed
             let postVersedDose = 0.05 * weight;
             if (postVersedDose > 5) postVersedDose = 5;
             let postVersedVol = postVersedDose / 5;
-            result.postIntubation.push(`<strong>Versed:</strong><small>(0.05 mg/kg)</small><br>Dose: ${postVersedDose.toFixed(2)} mg<br>Volume: ${postVersedVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(postVersedVol)}<small>(5 mg maximum single dose)</small>`);
+            result.postIntubation.push(`<div class="med-item"><strong>Versed:</strong><small>(0.05 mg/kg)</small><br>Dose: ${postVersedDose.toFixed(2)} mg<br>Volume: ${postVersedVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(postVersedVol)}<small>(5 mg maximum single dose)</small></div>`);
 
-            // Ketamine
             let ketamineSedationDose = 1.0 * weight;
             let ketamineSedationVol = ketamineSedationDose / 50;
-            result.postIntubation.push(`<strong>Ketamine:</strong><small>(1 mg/kg)</small><br>Dose: ${ketamineSedationDose.toFixed(2)} mg<br>Volume: ${ketamineSedationVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineSedationVol)}<small>(Every 20 minutes as needed)</small>`);
+            result.postIntubation.push(`<div class="med-item"><strong>Ketamine:</strong><small>(1 mg/kg)</small><br>Dose: ${ketamineSedationDose.toFixed(2)} mg<br>Volume: ${ketamineSedationVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineSedationVol)}<small>(Every 20 minutes as needed)</small></div>`);
 
-            // Pain Management Calculations
             let fentanylDose = 0.5 * weight;
             if (fentanylDose > 100) fentanylDose = 100;
             let fentanylVol = fentanylDose / 50;
-            result.painManagement.push(`<strong>Fentanyl:</strong><br>Dose: ${fentanylDose.toFixed(2)} mcg<br>Volume: ${fentanylVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(fentanylVol)}`);
-            result.painManagement.push(`<strong>Morphine:</strong><br>2 mg = 0.2 mL<br>Max 10 mg = 1.0 mL<br>Syringe: 1 mL`);
-            result.painManagement.push(`<strong>Demerol:</strong><br>25 mg = 0.5 mL<br>Max 50 mg = 1.0 mL<br>Syringe: 1 mL<br>+ <strong>Phenergan:</strong> 12.5 mg = 0.5 mL`);
+            result.painManagement.push(`<div class="med-item"><strong>Fentanyl:</strong><br>Dose: ${fentanylDose.toFixed(2)} mcg<br>Volume: ${fentanylVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(fentanylVol)}</div>`);
+            result.painManagement.push(`<div class="med-item"><strong>Morphine:</strong><br>2 mg = 0.2 mL<br>Max 10 mg = 1.0 mL<br>Syringe: 1 mL</div>`);
+            result.painManagement.push(`<div class="med-item"><strong>Demerol:</strong><br>25 mg = 0.5 mL<br>Max 50 mg = 1.0 mL<br>Syringe: 1 mL<br>+ <strong>Phenergan:</strong> 12.5 mg = 0.5 mL</div>`);
 
             let output = `<h3>Results for ${weight} kg</h3>`;
             output += `
@@ -217,6 +238,7 @@
             
             resultsDiv.innerHTML = output;
             initializeSwiper();
+            addMedicationToggles(); // Call the new function after results are rendered
         }
 
         function displaySection(title, items) {
@@ -224,7 +246,7 @@
                 <div class="swiper-slide">
                     <div class="section">
                         <h3>${title}</h3>
-                        <div style="line-height: 1.6;">${items.join("<br><br>")}</div>
+                        <div style="line-height: 1.6;">${items.join("")}</div>
                     </div>
                 </div>`;
         }
@@ -237,3 +259,4 @@
     </script>
 </body>
 </html>
+
