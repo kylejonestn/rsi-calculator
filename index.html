@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>RSI Bundle Calculator</title>
+    <title>RSI Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Swiper.js CSS -->
     <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
@@ -56,7 +56,6 @@
         .result > h3 {
             margin-top: 0;
             color: #333;
-            border-bottom: 2px solid #ddd;
             padding-bottom: 10px;
             margin-bottom: 15px;
             text-align: center;
@@ -76,6 +75,7 @@
         .swiper-container {
             width: 100%;
             padding-bottom: 40px;
+            position: relative; 
         }
         .swiper-slide {
             box-sizing: border-box;
@@ -87,19 +87,30 @@
         .swiper-pagination-bullet-active {
             background-color: #007bff !important;
         }
-        .swiper-button-next, .swiper-button-prev {
-            color: #007bff !important;
+        /* NEW: Style for the disclaimer */
+        .disclaimer {
+            margin-top: 25px;
+            padding: 0 10px;
+            font-size: 0.9rem;
+            font-style: italic;
+            color: #6c757d;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <img src="ems_macon_tn_logo.png" alt="Macon County EMS Logo" class="logo">
-        <h2>RSI Bundle Calculator<br>(Macon County EMS)</h2>
+        <!-- UPDATED: Removed "Bundle" from the h2 title -->
+        <h2>RSI Calculator<br>(Macon County EMS)</h2>
         <label for="weight">Enter patient weight (kg):</label>
         <input type="number" id="weight" placeholder="e.g., 80" inputmode="decimal">
         <button onclick="calculateRSI()">Calculate</button>
         <div class="result" id="results"></div>
+        <!-- NEW: Disclaimer added at the bottom -->
+        <div class="disclaimer">
+            This app does math better than most of us do at 3 AM. But seriously, it's your license and your patient. Double-check everything before you push anything.
+        </div>
     </div>
 
     <!-- Swiper.js JavaScript -->
@@ -121,17 +132,15 @@
                     el: '.swiper-pagination',
                     clickable: true,
                 },
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
             });
         }
 
         function calculateRSI() {
+            const resultsDiv = document.getElementById('results');
             let weight = parseFloat(document.getElementById('weight').value);
+
             if (isNaN(weight) || weight <= 0) {
-                // We don't need an alert here if triggered by 'Enter' on an empty field
+                resultsDiv.innerHTML = '';
                 return;
             }
 
@@ -179,12 +188,10 @@
                         ${displaySection("Pain Management", result.painManagement)}
                     </div>
                     <div class="swiper-pagination"></div>
-                    <div class="swiper-button-prev"></div>
-                    <div class="swiper-button-next"></div>
                 </div>
             `;
             
-            document.getElementById('results').innerHTML = output;
+            resultsDiv.innerHTML = output;
             initializeSwiper();
         }
 
@@ -198,19 +205,10 @@
                 </div>`;
         }
 
-        // --- NEW SCRIPT TO HANDLE 'ENTER' KEY ---
         document.addEventListener('DOMContentLoaded', (event) => {
             const weightInput = document.getElementById('weight');
             
-            weightInput.addEventListener('keyup', function(e) {
-                // Check if the key pressed was 'Enter'
-                if (e.key === 'Enter') {
-                    // Prevent the default form submission behavior
-                    e.preventDefault();
-                    // Trigger the calculate button's click event
-                    document.querySelector('button').click();
-                }
-            });
+            weightInput.addEventListener('input', calculateRSI);
         });
     </script>
 </body>
