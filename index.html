@@ -72,6 +72,13 @@
             margin-bottom: 15px;
             font-size: 1.75rem;
         }
+        /* NEW: Style for formula/context text */
+        .section small {
+            color: #6c757d;
+            font-size: 0.9em;
+            display: block;
+            line-height: 1.2;
+        }
         .swiper-container {
             width: 100%;
             padding-bottom: 40px;
@@ -87,7 +94,6 @@
         .swiper-pagination-bullet-active {
             background-color: #007bff !important;
         }
-        /* NEW: Style for the disclaimer */
         .disclaimer {
             margin-top: 25px;
             padding: 0 10px;
@@ -101,13 +107,11 @@
 <body>
     <div class="container">
         <img src="ems_macon_tn_logo.png" alt="Macon County EMS Logo" class="logo">
-        <!-- UPDATED: Removed "Bundle" from the h2 title -->
         <h2>RSI Calculator<br>(Macon County EMS)</h2>
         <label for="weight">Enter patient weight (kg):</label>
         <input type="number" id="weight" placeholder="e.g., 80" inputmode="decimal">
         <button onclick="calculateRSI()">Calculate</button>
         <div class="result" id="results"></div>
-        <!-- NEW: Disclaimer added at the bottom -->
         <div class="disclaimer">
             This app does math better than most of us do at 3 AM. But seriously, it's your license and your patient. Double-check everything before you push anything.
         </div>
@@ -151,7 +155,7 @@
                 painManagement: []
             };
 
-            // Calculation logic remains the same...
+            // Sedation Calculations
             let etomidateDose = 0.3 * weight;
             let etomidateVol = etomidateDose / 2;
             result.sedation.push(`<strong>Etomidate:</strong><br>Dose: ${etomidateDose.toFixed(2)} mg<br>Volume: ${etomidateVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(etomidateVol)}`);
@@ -159,6 +163,8 @@
             let ketamineInductionDose = 2.0 * weight;
             let ketamineInductionVol = ketamineInductionDose / 50;
             result.sedation.push(`<strong>Ketamine (Induction):</strong><br>Dose: ${ketamineInductionDose.toFixed(2)} mg<br>Volume: ${ketamineInductionVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineInductionVol)}`);
+            
+            // Paralytics Calculations
             let succDose = 1.0 * weight;
             let succVol = succDose / 20;
             result.paralytics.push(`<strong>Succinylcholine:</strong><br>Dose: ${succDose.toFixed(2)} mg<br>Volume: ${succVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(succVol)}`);
@@ -168,9 +174,27 @@
             let vecHighDose = 0.1 * weight;
             let vecHighVol = vecHighDose / 1;
             result.paralytics.push(`<strong>Vecuronium (High Dose):</strong><br>Dose: ${vecHighDose.toFixed(2)} mg<br>Volume: ${vecHighVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecHighVol)}`);
+            
+            // --- UPDATED Post Intubation Calculations ---
+            result.postIntubation.push(`If patients level of consciousness increases and sedation is required:`);
+            
+            // Fentanyl
+            let postFentanylDose = 0.5 * weight;
+            let postFentanylVol = postFentanylDose / 50;
+            result.postIntubation.push(`<strong>Fentanyl:</strong><small>(0.5 mcg/kg)</small><br>Dose: ${postFentanylDose.toFixed(2)} mcg<br>Volume: ${postFentanylVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(postFentanylVol)}<small>(0.5 mcg/kg increment maximum)<br>(5.0 mcg/kg maximum)</small>`);
+            
+            // Versed
+            let postVersedDose = 0.05 * weight;
+            if (postVersedDose > 5) postVersedDose = 5;
+            let postVersedVol = postVersedDose / 5;
+            result.postIntubation.push(`<strong>Versed:</strong><small>(0.05 mg/kg)</small><br>Dose: ${postVersedDose.toFixed(2)} mg<br>Volume: ${postVersedVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(postVersedVol)}<small>(5 mg maximum single dose)</small>`);
+
+            // Ketamine
             let ketamineSedationDose = 1.0 * weight;
             let ketamineSedationVol = ketamineSedationDose / 50;
-            result.postIntubation.push(`<strong>Ketamine (Sedation):</strong><br>Dose: ${ketamineSedationDose.toFixed(2)} mg<br>Volume: ${ketamineSedationVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineSedationVol)}`);
+            result.postIntubation.push(`<strong>Ketamine:</strong><small>(1 mg/kg)</small><br>Dose: ${ketamineSedationDose.toFixed(2)} mg<br>Volume: ${ketamineSedationVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineSedationVol)}<small>(Every 20 minutes as needed)</small>`);
+
+            // Pain Management Calculations
             let fentanylDose = 0.5 * weight;
             if (fentanylDose > 100) fentanylDose = 100;
             let fentanylVol = fentanylDose / 50;
