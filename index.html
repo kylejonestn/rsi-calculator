@@ -3,6 +3,9 @@
 <head>
     <title>RSI Bundle Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Swiper.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
     <style>
         html { font-size: 110%; }
         body {
@@ -48,6 +51,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             text-align: left;
             font-size: 1.25rem;
+            overflow: hidden;
         }
         .result > h3 {
             margin-top: 0;
@@ -62,87 +66,31 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             padding: 20px;
-            margin-top: 20px;
         }
-        .section:first-child { margin-top: 0; }
         .section h3 {
             color: #444;
             margin-top: 0;
             margin-bottom: 15px;
             font-size: 1.75rem;
         }
+        .swiper-container {
+            width: 100%;
+            padding-bottom: 40px;
+        }
+        .swiper-slide {
+            box-sizing: border-box;
+            align-self: stretch;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .swiper-pagination-bullet-active {
+            background-color: #007bff !important;
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: #007bff !important;
+        }
     </style>
-    <script>
-        function calculateRSI() {
-            let weight = parseFloat(document.getElementById('weight').value);
-            if (isNaN(weight) || weight <= 0) {
-                alert("Please enter a valid weight in kg.");
-                return;
-            }
-
-            const result = {
-                sedation: [],
-                paralytics: [],
-                postIntubation: [],
-                painManagement: []
-            };
-
-            let etomidateDose = 0.3 * weight;
-            let etomidateVol = etomidateDose / 2;
-            result.sedation.push(`<strong>Etomidate:</strong><br>Dose: ${etomidateDose.toFixed(2)} mg<br>Volume: ${etomidateVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(etomidateVol)}`);
-
-            result.sedation.push(`<strong>Versed (Sedation):</strong><br>2 mg = 0.4 mL<br>3 mg = 0.6 mL<br>4 mg = 0.8 mL<br>5 mg = 1.0 mL<br>All use 1 mL syringe`);
-
-            let ketamineInductionDose = 2.0 * weight;
-            let ketamineInductionVol = ketamineInductionDose / 50;
-            result.sedation.push(`<strong>Ketamine (Induction):</strong><br>Dose: ${ketamineInductionDose.toFixed(2)} mg<br>Volume: ${ketamineInductionVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineInductionVol)}`);
-
-            let succDose = 1.0 * weight;
-            let succVol = succDose / 20;
-            result.paralytics.push(`<strong>Succinylcholine:</strong><br>Dose: ${succDose.toFixed(2)} mg<br>Volume: ${succVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(succVol)}`);
-
-            let vecLowDose = 0.01 * weight;
-            let vecLowVol = vecLowDose / 1;
-            result.paralytics.push(`<strong>Vecuronium (Low Dose):</strong><br>Dose: ${vecLowDose.toFixed(2)} mg<br>Volume: ${vecLowVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecLowVol)}`);
-
-            let vecHighDose = 0.1 * weight;
-            let vecHighVol = vecHighDose / 1;
-            result.paralytics.push(`<strong>Vecuronium (High Dose):</strong><br>Dose: ${vecHighDose.toFixed(2)} mg<br>Volume: ${vecHighVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecHighVol)}`);
-
-            let ketamineSedationDose = 1.0 * weight;
-            let ketamineSedationVol = ketamineSedationDose / 50;
-            result.postIntubation.push(`<strong>Ketamine (Sedation):</strong><br>Dose: ${ketamineSedationDose.toFixed(2)} mg<br>Volume: ${ketamineSedationVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineSedationVol)}`);
-
-            let fentanylDose = 0.5 * weight;
-            if (fentanylDose > 100) fentanylDose = 100;
-            let fentanylVol = fentanylDose / 50;
-            result.painManagement.push(`<strong>Fentanyl:</strong><br>Dose: ${fentanylDose.toFixed(2)} mcg<br>Volume: ${fentanylVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(fentanylVol)}`);
-
-            result.painManagement.push(`<strong>Morphine:</strong><br>2 mg = 0.2 mL<br>Max 10 mg = 1.0 mL<br>Syringe: 1 mL`);
-
-            result.painManagement.push(`<strong>Demerol:</strong><br>25 mg = 0.5 mL<br>Max 50 mg = 1.0 mL<br>Syringe: 1 mL<br>+ <strong>Phenergan:</strong> 12.5 mg = 0.5 mL`);
-
-            let output = `<h3>Results for ${weight} kg</h3>`;
-            output += displaySection("Sedation", result.sedation);
-            output += displaySection("Paralyzing Agent", result.paralytics);
-            output += displaySection("Post Intubation", result.postIntubation);
-            output += displaySection("Pain Management", result.painManagement);
-
-            document.getElementById('results').innerHTML = output;
-        }
-
-        function displaySection(title, items) {
-            return `<div class="section"><h3>${title}</h3><div style="line-height: 1.6;">${items.join("<br><br>")}</div></div>`;
-        }
-
-        function suggestSyringe(volume) {
-            if (volume <= 1) return "1 mL";
-            if (volume <= 3) return "3 mL";
-            if (volume <= 6) return "5 mL";
-            if (volume <= 10) return "10 mL";
-            return "20 mL+";
-        }
-    </script>
 </head>
 <body>
     <div class="container">
@@ -153,5 +101,117 @@
         <button onclick="calculateRSI()">Calculate</button>
         <div class="result" id="results"></div>
     </div>
+
+    <!-- Swiper.js JavaScript -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+    <script>
+        function suggestSyringe(volume) {
+            if (volume <= 1) return "1 mL";
+            if (volume <= 3) return "3 mL";
+            if (volume <= 6) return "5 mL";
+            if (volume <= 10) return "10 mL";
+            return "20 mL+";
+        }
+        
+        function initializeSwiper() {
+            const swiper = new Swiper('.swiper-container', {
+                loop: false,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+            });
+        }
+
+        function calculateRSI() {
+            let weight = parseFloat(document.getElementById('weight').value);
+            if (isNaN(weight) || weight <= 0) {
+                // We don't need an alert here if triggered by 'Enter' on an empty field
+                return;
+            }
+
+            const result = {
+                sedation: [],
+                paralytics: [],
+                postIntubation: [],
+                painManagement: []
+            };
+
+            // Calculation logic remains the same...
+            let etomidateDose = 0.3 * weight;
+            let etomidateVol = etomidateDose / 2;
+            result.sedation.push(`<strong>Etomidate:</strong><br>Dose: ${etomidateDose.toFixed(2)} mg<br>Volume: ${etomidateVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(etomidateVol)}`);
+            result.sedation.push(`<strong>Versed (Sedation):</strong><br>2 mg = 0.4 mL<br>3 mg = 0.6 mL<br>4 mg = 0.8 mL<br>5 mg = 1.0 mL<br>All use 1 mL syringe`);
+            let ketamineInductionDose = 2.0 * weight;
+            let ketamineInductionVol = ketamineInductionDose / 50;
+            result.sedation.push(`<strong>Ketamine (Induction):</strong><br>Dose: ${ketamineInductionDose.toFixed(2)} mg<br>Volume: ${ketamineInductionVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineInductionVol)}`);
+            let succDose = 1.0 * weight;
+            let succVol = succDose / 20;
+            result.paralytics.push(`<strong>Succinylcholine:</strong><br>Dose: ${succDose.toFixed(2)} mg<br>Volume: ${succVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(succVol)}`);
+            let vecLowDose = 0.01 * weight;
+            let vecLowVol = vecLowDose / 1;
+            result.paralytics.push(`<strong>Vecuronium (Low Dose):</strong><br>Dose: ${vecLowDose.toFixed(2)} mg<br>Volume: ${vecLowVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecLowVol)}`);
+            let vecHighDose = 0.1 * weight;
+            let vecHighVol = vecHighDose / 1;
+            result.paralytics.push(`<strong>Vecuronium (High Dose):</strong><br>Dose: ${vecHighDose.toFixed(2)} mg<br>Volume: ${vecHighVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(vecHighVol)}`);
+            let ketamineSedationDose = 1.0 * weight;
+            let ketamineSedationVol = ketamineSedationDose / 50;
+            result.postIntubation.push(`<strong>Ketamine (Sedation):</strong><br>Dose: ${ketamineSedationDose.toFixed(2)} mg<br>Volume: ${ketamineSedationVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(ketamineSedationVol)}`);
+            let fentanylDose = 0.5 * weight;
+            if (fentanylDose > 100) fentanylDose = 100;
+            let fentanylVol = fentanylDose / 50;
+            result.painManagement.push(`<strong>Fentanyl:</strong><br>Dose: ${fentanylDose.toFixed(2)} mcg<br>Volume: ${fentanylVol.toFixed(2)} mL<br>Syringe: ${suggestSyringe(fentanylVol)}`);
+            result.painManagement.push(`<strong>Morphine:</strong><br>2 mg = 0.2 mL<br>Max 10 mg = 1.0 mL<br>Syringe: 1 mL`);
+            result.painManagement.push(`<strong>Demerol:</strong><br>25 mg = 0.5 mL<br>Max 50 mg = 1.0 mL<br>Syringe: 1 mL<br>+ <strong>Phenergan:</strong> 12.5 mg = 0.5 mL`);
+
+            let output = `<h3>Results for ${weight} kg</h3>`;
+            output += `
+                <div class="swiper-container">
+                    <div class="swiper-wrapper">
+                        ${displaySection("Sedation", result.sedation)}
+                        ${displaySection("Paralyzing Agent", result.paralytics)}
+                        ${displaySection("Post Intubation", result.postIntubation)}
+                        ${displaySection("Pain Management", result.painManagement)}
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            `;
+            
+            document.getElementById('results').innerHTML = output;
+            initializeSwiper();
+        }
+
+        function displaySection(title, items) {
+            return `
+                <div class="swiper-slide">
+                    <div class="section">
+                        <h3>${title}</h3>
+                        <div style="line-height: 1.6;">${items.join("<br><br>")}</div>
+                    </div>
+                </div>`;
+        }
+
+        // --- NEW SCRIPT TO HANDLE 'ENTER' KEY ---
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const weightInput = document.getElementById('weight');
+            
+            weightInput.addEventListener('keyup', function(e) {
+                // Check if the key pressed was 'Enter'
+                if (e.key === 'Enter') {
+                    // Prevent the default form submission behavior
+                    e.preventDefault();
+                    // Trigger the calculate button's click event
+                    document.querySelector('button').click();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
